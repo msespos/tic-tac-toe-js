@@ -1,13 +1,12 @@
 const boardController = (() => {
   let gameBoard = [
-    ["X", "O", "X"],
-    ["O", "X", "O"],
-    ["X", "O", "X"]
+    ["1", "2", "3"],
+    ["4", "5", "6"],
+    ["7", "8", "9"]
   ];
-
   const displayBoard = (board) => {
+    console.log(this);
     const boardDisplay = document.getElementById("board");
-    console.log(boardDisplay);
     board.forEach((row) => {
       const rowDisplay = document.createElement("div");
       boardDisplay.appendChild(rowDisplay);
@@ -17,15 +16,22 @@ const boardController = (() => {
       });
     });
   };
-
   return { gameBoard, displayBoard };
 })();
-
-boardController.displayBoard(boardController.gameBoard);
 
 const gameController = (() => {
 })();
 
-const Player = (name) => {
-  return { name };
+const Player = (name, symbol) => {
+  const playMove = (board, space) => {
+    if ([1, 2, 3].includes(parseInt(space))) {
+      board[0][parseInt(space) - 1] = symbol;
+    }
+    return board;
+  }
+  return { name, symbol, playMove };
 };
+
+let player1 = Player("mike", "X");
+boardController.gameBoard = player1.playMove(boardController.gameBoard, "3")
+boardController.displayBoard(boardController.gameBoard);
