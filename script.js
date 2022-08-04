@@ -1,5 +1,5 @@
 const boardController = (() => {
-  let gameBoard = ["1", "2", "3", "4","5", "6", "7", "8", "9"];
+  let gameBoard = ["", "", "", "","", "", "", "", ""];
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
@@ -12,22 +12,28 @@ const boardController = (() => {
 })();
 
 const gameController = (() => {
+  const switchCurrentPlayer = () => {
+    if (currentPlayer === player1) {
+      currentPlayer = player2;
+    } else {
+      currentPlayer = player1;
+    }
+  };
+  return { switchCurrentPlayer };
 })();
 
 const Player = (name, symbol) => {
   const playMove = (space) => {
     space = parseInt(space);
-    boardController.gameBoard[space - 1] = symbol;
+    if (boardController.gameBoard[space - 1] === "") {
+      boardController.gameBoard[space - 1] = symbol;
+      gameController.switchCurrentPlayer();
+    }
     boardController.displayBoard();
   }
   return { name, symbol, playMove };
 };
 
-let player1 = Player("mike", "X");
-let player2 = Player("katie", "O");
-let currentPlayer = player1;
-
-player1.playMove("8");
-player2.playMove("3");
-player1.playMove("5");
-
+const player1 = Player("mike", "X");
+const player2 = Player("katie", "O");
+currentPlayer = player1;
