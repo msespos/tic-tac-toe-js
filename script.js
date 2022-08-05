@@ -14,6 +14,23 @@ const boardController = (() => {
 
 // contains game logic
 const gameController = (() => {
+  // check for end of game conditions
+  const gameOver = () => {
+    if (winningGame() === true) {
+      return "win";
+    } else if (fullBoard() === true) {
+      return "tie";
+    }
+  }
+  const fullBoard = () => {
+    let fullOrNot = true;
+    boardController.gameBoard.forEach((space) => {
+      if (space === "") {
+        fullOrNot = false;
+      }
+    });
+    return fullOrNot;
+  }
   // check if a game has been won - called by playMove every time it is triggered
   const winningGame = () => {
     if (winViaRow() === true || winViaColumn() === true || winViaDiagonal() === true) {
@@ -65,7 +82,8 @@ const gameController = (() => {
       currentPlayer = player1;
     }
   };
-  return { winningGame, winViaRow, winViaColumn, winViaDiagonal, switchCurrentPlayer };
+  return { gameOver, fullBoard, winningGame, winViaRow, winViaColumn, winViaDiagonal,
+           switchCurrentPlayer };
 })();
 
 // game player objects - two will be created below
@@ -76,10 +94,12 @@ const Player = (name, symbol) => {
     if (boardController.gameBoard[space] === "") {
       boardController.gameBoard[space] = symbol;
     }
-    if (gameController.winningGame() === true) {
+    if (gameController.gameOver() === "win") {
       boardController.displayBoard();
-      alert(currentPlayer.name + " wins!");
-    } else {
+      alert("Game Over - " + currentPlayer.name + " wins!");
+    } else if (gameController.gameOver() === "tie") {
+      boardController.displayBoard();
+      alert("Game Over - Tie");
     }
     gameController.switchCurrentPlayer();
     boardController.displayBoard();
