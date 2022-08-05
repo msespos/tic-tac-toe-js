@@ -1,9 +1,11 @@
 // contains board array and board display method
 const boardController = (() => {
   let gameBoard = ["", "", "", "","", "", "", "", ""];
+  // called by playMove Player method
   const placeSymbol = (space, symbol) => {
     gameBoard[space] = symbol;
-  }
+  };
+  // called by playMove Player method
   const checkForAndDisplayEnd = () => {
     if (gameController.gameOver() === "win") {
       displayBoard();
@@ -12,7 +14,7 @@ const boardController = (() => {
       displayBoard();
       alert("Game Over - Tie");
     }
-  }
+  };
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
@@ -26,14 +28,15 @@ const boardController = (() => {
 
 // contains game logic
 const gameController = (() => {
-  // check for end of game conditions
+  // check for end conditions - called by boardController.checkForAndDisplayEnd
   const gameOver = () => {
     if (winningGame() === true) {
       return "win";
     } else if (fullBoard() === true) {
       return "tie";
     }
-  }
+  };
+  // called by gameOver
   const fullBoard = () => {
     let fullOrNot = true;
     boardController.gameBoard.forEach((space) => {
@@ -42,15 +45,15 @@ const gameController = (() => {
       }
     });
     return fullOrNot;
-  }
-  // check if a game has been won - called by playMove every time it is triggered
+  };
+  // called by gameOver
   const winningGame = () => {
     if (winViaRow() === true || winViaColumn() === true || winViaDiagonal() === true) {
       return true;
     } else {
       return false;
     }
-  }
+  };
   // called by winningGame
   const winViaRow = () => {
     let winOrNot = false;
@@ -62,7 +65,7 @@ const gameController = (() => {
       }
     }
     return winOrNot;
-  }
+  };
   // called by winningGame
   const winViaColumn = () => {
     let winOrNot = false;
@@ -74,7 +77,7 @@ const gameController = (() => {
       }
     }
     return winOrNot;
-  }
+  };
   // called by winningGame
   const winViaDiagonal = () => {
     if (boardController.gameBoard[0] != ""
@@ -85,7 +88,7 @@ const gameController = (() => {
             && boardController.gameBoard[4] === boardController.gameBoard[6]) {
       return true;
     }
-  }
+  };
   // switch the current player - called by playMove each time it is triggered
   const switchCurrentPlayer = () => {
     if (currentPlayer === player1) {
@@ -113,6 +116,6 @@ const Player = (name, symbol) => {
 };
 
 // initialization of players / current player
-const player1 = Player("mike", "X");
-const player2 = Player("katie", "O");
+const player1 = Player("Baby Yoda", "X");
+const player2 = Player("Luke Skywalker", "O");
 currentPlayer = player1;
