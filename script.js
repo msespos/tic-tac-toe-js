@@ -12,6 +12,45 @@ const boardController = (() => {
 })();
 
 const gameController = (() => {
+  const winningGame = () => {
+    if (winViaRow() === true || winViaColumn() === true || winViaDiagonal() === true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  const winViaRow = () => {
+    let winOrNot = false;
+    for (let i = 0; i < 9; i += 3) {
+      if (boardController.gameBoard[i] != ""
+          && boardController.gameBoard[i] === boardController.gameBoard[i + 1]
+          && boardController.gameBoard[i + 1] === boardController.gameBoard[i + 2]) {
+        winOrNot = true;
+      }
+    }
+    return winOrNot;
+  }
+  const winViaColumn = () => {
+    let winOrNot = false;
+    for (let i = 0; i < 3; i += 1) {
+      if (boardController.gameBoard[i] != ""
+          && boardController.gameBoard[i] === boardController.gameBoard[i + 3]
+          && boardController.gameBoard[i + 3] === boardController.gameBoard[i + 6]) {
+        winOrNot = true;
+      }
+    }
+    return winOrNot;
+  }
+  const winViaDiagonal = () => {
+    if (boardController.gameBoard[0] != ""
+          && boardController.gameBoard[0] === boardController.gameBoard[4]
+          && boardController.gameBoard[4] === boardController.gameBoard[8]
+        || boardController.gameBoard[2] != ""
+            && boardController.gameBoard[2] === boardController.gameBoard[4]
+            && boardController.gameBoard[4] === boardController.gameBoard[6]) {
+      return true;
+    }
+  }
   const switchCurrentPlayer = () => {
     if (currentPlayer === player1) {
       currentPlayer = player2;
@@ -19,7 +58,7 @@ const gameController = (() => {
       currentPlayer = player1;
     }
   };
-  return { switchCurrentPlayer };
+  return { winningGame, winViaRow, winViaColumn, winViaDiagonal, switchCurrentPlayer };
 })();
 
 const Player = (name, symbol) => {
@@ -27,8 +66,13 @@ const Player = (name, symbol) => {
     space = parseInt(space);
     if (boardController.gameBoard[space - 1] === "") {
       boardController.gameBoard[space - 1] = symbol;
-      gameController.switchCurrentPlayer();
     }
+    if (gameController.winningGame() === true) {
+      boardController.displayBoard();
+      alert(currentPlayer.name + " wins!");
+    } else {
+    }
+    gameController.switchCurrentPlayer();
     boardController.displayBoard();
   }
   return { name, symbol, playMove };
