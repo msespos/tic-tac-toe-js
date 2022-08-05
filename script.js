@@ -64,8 +64,8 @@ const gameController = (() => {
 const Player = (name, symbol) => {
   const playMove = (space) => {
     space = parseInt(space);
-    if (boardController.gameBoard[space - 1] === "") {
-      boardController.gameBoard[space - 1] = symbol;
+    if (boardController.gameBoard[space] === "") {
+      boardController.gameBoard[space] = symbol;
     }
     if (gameController.winningGame() === true) {
       boardController.displayBoard();
