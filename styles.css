@@ -3,6 +3,27 @@
   color: purple;
 }
 
+a, h6 {
+  font-size: x-small;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.letter {
+  font-size: xxx-large;
+  display: flex;
+  justify-content: center;
+}
+
 .board {
   display: flex;
   flex-direction: column;
