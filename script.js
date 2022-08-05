@@ -1,6 +1,18 @@
 // contains board array and board display method
 const boardController = (() => {
   let gameBoard = ["", "", "", "","", "", "", "", ""];
+  const placeSymbol = (space, symbol) => {
+    gameBoard[space] = symbol;
+  }
+  const checkForAndDisplayEnd = () => {
+    if (gameController.gameOver() === "win") {
+      displayBoard();
+      alert("Game Over - " + currentPlayer.name + " wins!");
+    } else if (gameController.gameOver() === "tie") {
+      displayBoard();
+      alert("Game Over - Tie");
+    }
+  }
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
@@ -9,7 +21,7 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  return { gameBoard, displayBoard };
+  return { gameBoard, placeSymbol, checkForAndDisplayEnd, displayBoard };
 })();
 
 // contains game logic
@@ -90,18 +102,11 @@ const gameController = (() => {
 const Player = (name, symbol) => {
   // play a move - triggered by an onClick in index.html
   const playMove = (space) => {
-    space = parseInt(space);
     if (boardController.gameBoard[space] === "") {
-      boardController.gameBoard[space] = symbol;
+      boardController.placeSymbol(space, symbol);
+      boardController.checkForAndDisplayEnd();
+      gameController.switchCurrentPlayer();
     }
-    if (gameController.gameOver() === "win") {
-      boardController.displayBoard();
-      alert("Game Over - " + currentPlayer.name + " wins!");
-    } else if (gameController.gameOver() === "tie") {
-      boardController.displayBoard();
-      alert("Game Over - Tie");
-    }
-    gameController.switchCurrentPlayer();
     boardController.displayBoard();
   }
   return { name, symbol, playMove };
