@@ -9,10 +9,12 @@ const boardController = (() => {
   const checkForAndDisplayEnd = () => {
     if (gameController.gameOver() === "win") {
       disableGrid();
+      addNewGameButton();
       displayBoard();
       alert("Game Over - " + currentPlayer.name + " wins!");
     } else if (gameController.gameOver() === "tie") {
       disableGrid();
+      addNewGameButton();
       displayBoard();
       alert("Game Over - Tie");
     }
@@ -23,6 +25,11 @@ const boardController = (() => {
       box.style.pointerEvents = 'none';
     }
   }
+  const addNewGameButton = () => {
+    const button = document.getElementById("new-game-button")
+    button.style.display = "block";
+  }
+
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
