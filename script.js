@@ -8,13 +8,21 @@ const boardController = (() => {
   // called by playMove Player method
   const checkForAndDisplayEnd = () => {
     if (gameController.gameOver() === "win") {
+      disableGrid();
       displayBoard();
       alert("Game Over - " + currentPlayer.name + " wins!");
     } else if (gameController.gameOver() === "tie") {
+      disableGrid();
       displayBoard();
       alert("Game Over - Tie");
     }
   };
+  const disableGrid = () => {
+    for (i = 0; i < 9; i++) {
+      const box = document.getElementById("box-" + (i + 1));
+      box.style.pointerEvents = 'none';
+    }
+  }
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
