@@ -1,21 +1,25 @@
-// contains board array and board display method
+// contains board array
+const Board = (() => {
+  let gameBoard = ["", "", "", "", "", "", "", "", ""];
+  return { gameBoard };
+})();
+
+// contains board display methods
 const boardController = (() => {
-  let gameBoard = ["", "", "", "","", "", "", "", ""];
   // called by playMove Player method
   const placeSymbol = (space, symbol) => {
-    gameBoard[space] = symbol;
+    Board.gameBoard[space] = symbol;
   };
   // called by playMove Player method
   const checkForAndDisplayEnd = () => {
-    if (gameController.gameOver() === "win") {
+    if (gameController.gameOver() === "win" || gameController.gameOver() === "tie") {
       disableGrid();
       addNewGameButton();
       displayBoard();
+    }
+    if (gameController.gameOver() === "win") {
       alert("Game Over - " + currentPlayer.name + " wins!");
     } else if (gameController.gameOver() === "tie") {
-      disableGrid();
-      addNewGameButton();
-      displayBoard();
       alert("Game Over - Tie");
     }
   };
@@ -29,32 +33,31 @@ const boardController = (() => {
     const button = document.getElementById("new-game-button")
     button.style.display = "block";
   }
-
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
       box.textContent = "";
-      const token = document.createTextNode(gameBoard[i]);
+      const token = document.createTextNode(Board.gameBoard[i]);
       box.appendChild(token);
     }
   };
-  return { gameBoard, placeSymbol, checkForAndDisplayEnd, displayBoard };
+  return { placeSymbol, checkForAndDisplayEnd, displayBoard };
 })();
 
 // contains game logic
 const gameController = (() => {
   // check for end conditions - called by boardController.checkForAndDisplayEnd
   const gameOver = () => {
-    if (winningGame() === true) {
+    if (winningGame()) {
       return "win";
-    } else if (fullBoard() === true) {
+    } else if (fullBoard()) {
       return "tie";
     }
   };
   // called by gameOver
   const fullBoard = () => {
     let fullOrNot = true;
-    boardController.gameBoard.forEach((space) => {
+    Board.gameBoard.forEach((space) => {
       if (space === "") {
         fullOrNot = false;
       }
@@ -63,19 +66,15 @@ const gameController = (() => {
   };
   // called by gameOver
   const winningGame = () => {
-    if (winViaRow() === true || winViaColumn() === true || winViaDiagonal() === true) {
-      return true;
-    } else {
-      return false;
-    }
+    return winViaRow() || winViaColumn() || winViaDiagonal();
   };
   // called by winningGame
   const winViaRow = () => {
     let winOrNot = false;
     for (let i = 0; i < 9; i += 3) {
-      if (boardController.gameBoard[i] != ""
-          && boardController.gameBoard[i] === boardController.gameBoard[i + 1]
-          && boardController.gameBoard[i + 1] === boardController.gameBoard[i + 2]) {
+      if (Board.gameBoard[i] != "" &&
+          Board.gameBoard[i] === Board.gameBoard[i + 1] &&
+          Board.gameBoard[i + 1] === Board.gameBoard[i + 2]) {
         winOrNot = true;
       }
     }
@@ -85,9 +84,9 @@ const gameController = (() => {
   const winViaColumn = () => {
     let winOrNot = false;
     for (let i = 0; i < 3; i += 1) {
-      if (boardController.gameBoard[i] != ""
-          && boardController.gameBoard[i] === boardController.gameBoard[i + 3]
-          && boardController.gameBoard[i + 3] === boardController.gameBoard[i + 6]) {
+      if (Board.gameBoard[i] != "" &&
+          Board.gameBoard[i] === Board.gameBoard[i + 3] &&
+          Board.gameBoard[i + 3] === Board.gameBoard[i + 6]) {
         winOrNot = true;
       }
     }
@@ -95,14 +94,11 @@ const gameController = (() => {
   };
   // called by winningGame
   const winViaDiagonal = () => {
-    if (boardController.gameBoard[0] != ""
-          && boardController.gameBoard[0] === boardController.gameBoard[4]
-          && boardController.gameBoard[4] === boardController.gameBoard[8]
-        || boardController.gameBoard[2] != ""
-            && boardController.gameBoard[2] === boardController.gameBoard[4]
-            && boardController.gameBoard[4] === boardController.gameBoard[6]) {
-      return true;
-    }
+    return Board.gameBoard[4] != "" &&
+            (Board.gameBoard[0] === Board.gameBoard[4] &&
+             Board.gameBoard[4] === Board.gameBoard[8] ||
+             Board.gameBoard[2] === Board.gameBoard[4] &&
+             Board.gameBoard[4] === Board.gameBoard[6]);
   };
   // switch the current player - called by playMove each time it is triggered
   const switchCurrentPlayer = () => {
@@ -120,7 +116,7 @@ const gameController = (() => {
 const Player = (name, symbol) => {
   // play a move - triggered by an onClick in index.html
   const playMove = (space) => {
-    if (boardController.gameBoard[space] === "") {
+    if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, symbol);
       boardController.checkForAndDisplayEnd();
       gameController.switchCurrentPlayer();
