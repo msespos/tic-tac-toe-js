@@ -13,7 +13,6 @@ const boardController = (() => {
   // called by playMove Player method
   const checkForAndDisplayEnd = () => {
     if (gameController.gameOver() === "win" || gameController.gameOver() === "tie") {
-      disableGrid();
       addNewGameButton();
       displayBoard();
     }
@@ -23,12 +22,6 @@ const boardController = (() => {
       alert("Game Over - Tie");
     }
   };
-  const disableGrid = () => {
-    for (i = 0; i < 9; i++) {
-      const box = document.getElementById("box-" + (i + 1));
-      box.style.pointerEvents = 'none';
-    }
-  }
   const addNewGameButton = () => {
     const button = document.getElementById("new-game-button")
     button.style.display = "block";
@@ -124,6 +117,12 @@ const Player = (name, symbol) => {
       boardController.placeSymbol(space, symbol);
       boardController.checkForAndDisplayEnd();
       gameController.switchCurrentPlayer();
+    }
+    if (gameController.gameOver() === "win" || gameController.gameOver() === "tie") {
+      for (i = 0; i < 9; i++) {
+        const box = document.getElementById("box-" + (i + 1));
+        box.style.pointerEvents = "none";
+      }
     }
     boardController.displayBoard();
   }
