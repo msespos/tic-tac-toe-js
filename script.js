@@ -45,16 +45,8 @@ const boardController = (() => {
 })();
 
 // contains game logic
-const gameController = (() => {
-  // check for end conditions - called by boardController.checkForAndDisplayEnd
-  const gameOver = () => {
-    if (winningGame()) {
-      return "win";
-    } else if (fullBoard()) {
-      return "tie";
-    }
-  };
-  // called by gameOver
+const Game = (() => {
+  // called by gameController.gameOver
   const fullBoard = () => {
     let fullOrNot = true;
     Board.gameBoard.forEach((space) => {
@@ -64,7 +56,7 @@ const gameController = (() => {
     });
     return fullOrNot;
   };
-  // called by gameOver
+  // called by gameController.gameOver
   const winningGame = () => {
     return winViaRow() || winViaColumn() || winViaDiagonal();
   };
@@ -100,7 +92,20 @@ const gameController = (() => {
              Board.gameBoard[2] === Board.gameBoard[4] &&
              Board.gameBoard[4] === Board.gameBoard[6]);
   };
-  // switch the current player - called by playMove each time it is triggered
+  return { fullBoard, winningGame, winViaRow, winViaColumn, winViaDiagonal };
+})();
+
+// contains gameplay methods
+const gameController = (() => {
+  // check for end conditions - called by boardController.checkForAndDisplayEnd
+  const gameOver = () => {
+    if (Game.winningGame()) {
+      return "win";
+    } else if (Game.fullBoard()) {
+      return "tie";
+    }
+  };
+  // switch the current player - called by Player.playMove each time it is triggered
   const switchCurrentPlayer = () => {
     if (currentPlayer === player1) {
       currentPlayer = player2;
@@ -108,8 +113,7 @@ const gameController = (() => {
       currentPlayer = player1;
     }
   };
-  return { gameOver, fullBoard, winningGame, winViaRow, winViaColumn, winViaDiagonal,
-           switchCurrentPlayer };
+  return { gameOver, switchCurrentPlayer };
 })();
 
 // game player objects - two will be created below
