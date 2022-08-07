@@ -106,19 +106,14 @@ const gameController = (() => {
       currentPlayer = player1;
     }
   };
-  return { gameOver, switchCurrentPlayer };
-})();
-
-// game player objects - two will be created below
-const Player = (name, symbol) => {
   // play a move - triggered by an onClick in index.html
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
-      boardController.placeSymbol(space, symbol);
+      boardController.placeSymbol(space, currentPlayer.symbol);
       boardController.checkForAndDisplayEnd();
-      gameController.switchCurrentPlayer();
+      switchCurrentPlayer();
     }
-    if (gameController.gameOver() === "win" || gameController.gameOver() === "tie") {
+    if (gameOver() === "win" || gameOver() === "tie") {
       for (i = 0; i < 9; i++) {
         const box = document.getElementById("box-" + (i + 1));
         box.style.pointerEvents = "none";
@@ -126,7 +121,12 @@ const Player = (name, symbol) => {
     }
     boardController.displayBoard();
   }
-  return { name, symbol, playMove };
+  return { gameOver, switchCurrentPlayer, playMove };
+})();
+
+// game player objects - two will be created below
+const Player = (name, symbol) => {
+  return { name, symbol };
 };
 
 // initialization of players / current player
