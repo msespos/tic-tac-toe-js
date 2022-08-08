@@ -34,7 +34,7 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  return { placeSymbol, checkForAndDisplayEnd, displayBoard };
+  return { placeSymbol, checkForAndDisplayEnd, addNewGameButton, displayBoard };
 })();
 
 // contains game logic
@@ -90,6 +90,18 @@ const Game = (() => {
 
 // contains gameplay methods
 const gameController = (() => {
+  const chooseGameFormat = () => {
+    let numPlayers = "";
+    numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
+    while (numPlayers !== "1" && numPlayers !== "2") {
+      numPlayers = prompt("Please enter 1 or 2");
+    };
+    return numPlayers;
+  }
+  const getMove = () => {
+
+  }
+
   // check for end conditions - called by boardController.checkForAndDisplayEnd
   const gameOver = () => {
     if (Game.winningGame()) {
@@ -121,7 +133,7 @@ const gameController = (() => {
     }
     boardController.displayBoard();
   }
-  return { gameOver, switchCurrentPlayer, playMove };
+  return { chooseGameFormat, gameOver, switchCurrentPlayer, playMove };
 })();
 
 // game player objects - two will be created below
@@ -129,7 +141,9 @@ const Player = (name, symbol) => {
   return { name, symbol };
 };
 
-// initialization of players / current player
+// initialization of players / current player / board and button
 const player1 = Player("Baby Yoda", "X");
 const player2 = Player("Luke Skywalker", "O");
 currentPlayer = player1;
+boardController.addNewGameButton();
+boardController.displayBoard();
