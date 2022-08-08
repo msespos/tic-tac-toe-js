@@ -4,6 +4,7 @@ const Board = (() => {
   return { gameBoard };
 })();
 
+
 // contains board display methods
 const boardController = (() => {
   // called by playMove Player method
@@ -26,6 +27,21 @@ const boardController = (() => {
     const button = document.getElementById("new-game-button")
     button.style.display = "block";
   }
+  const disableBoard = () => {
+    for (i = 0; i < 9; i++) {
+      const box = document.getElementById("box-" + (i + 1));
+      box.style.pointerEvents = "none";
+    }
+  }
+  const enableBoard = () => {
+    for (i = 0; i < 9; i++) {
+      const box = document.getElementById("box-" + (i + 1));
+      box.style.pointerEvents = "auto";
+    }
+  }
+  const clearBoard = () => {
+    Board.gameBoard.fill("");
+  }
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
@@ -34,7 +50,8 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  return { placeSymbol, checkForAndDisplayEnd, addNewGameButton, displayBoard };
+  return { placeSymbol, checkForAndDisplayEnd, addNewGameButton,
+           disableBoard, enableBoard, clearBoard, displayBoard };
 })();
 
 // contains game logic
@@ -90,18 +107,16 @@ const Game = (() => {
 
 // contains gameplay methods
 const gameController = (() => {
+  let numPlayers = ""
   const chooseGameFormat = () => {
-    let numPlayers = "";
     numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
     while (numPlayers !== "1" && numPlayers !== "2") {
       numPlayers = prompt("Please enter 1 or 2");
     };
-    return numPlayers;
+    boardController.clearBoard();
+    boardController.enableBoard();
+    boardController.displayBoard();
   }
-  const getMove = () => {
-
-  }
-
   // check for end conditions - called by boardController.checkForAndDisplayEnd
   const gameOver = () => {
     if (Game.winningGame()) {
@@ -126,14 +141,11 @@ const gameController = (() => {
       switchCurrentPlayer();
     }
     if (gameOver() === "win" || gameOver() === "tie") {
-      for (i = 0; i < 9; i++) {
-        const box = document.getElementById("box-" + (i + 1));
-        box.style.pointerEvents = "none";
-      }
+      boardController.disableBoard();
     }
     boardController.displayBoard();
   }
-  return { chooseGameFormat, gameOver, switchCurrentPlayer, playMove };
+  return { numPlayers, chooseGameFormat, gameOver, switchCurrentPlayer, playMove };
 })();
 
 // game player objects - two will be created below
@@ -145,5 +157,9 @@ const Player = (name, symbol) => {
 const player1 = Player("Baby Yoda", "X");
 const player2 = Player("Luke Skywalker", "O");
 currentPlayer = player1;
+boardController.disableBoard();
 boardController.addNewGameButton();
-boardController.displayBoard();
+if (gameController.numPlayers === "1") {
+  alert("Make your move, Baby Yoda!");
+}
+
