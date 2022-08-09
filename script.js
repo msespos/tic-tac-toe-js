@@ -4,7 +4,6 @@ const Board = (() => {
   return { gameBoard };
 })();
 
-
 // contains board display methods
 const boardController = (() => {
   // called by playMove Player method
@@ -12,21 +11,13 @@ const boardController = (() => {
     Board.gameBoard[space] = symbol;
   };
   // called by playMove Player method
-  const checkForAndDisplayEnd = () => {
-    if (gameController.gameOver() === "win" || gameController.gameOver() === "tie") {
-      addNewGameButton();
-      displayBoard();
-    }
-    if (gameController.gameOver() === "win") {
+  const displayEnd = () => {
+    if (Game.winningGame()) {
       alert("Game Over - " + currentPlayer.name + " wins!");
-    } else if (gameController.gameOver() === "tie") {
+    } else if (Game.fullBoard()) {
       alert("Game Over - Tie");
     }
   };
-  const addNewGameButton = () => {
-    const button = document.getElementById("new-game-button")
-    button.style.display = "block";
-  }
   const disableBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
@@ -50,13 +41,12 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  return { placeSymbol, checkForAndDisplayEnd, addNewGameButton,
-           disableBoard, enableBoard, clearBoard, displayBoard };
+  return { placeSymbol, displayEnd, disableBoard, enableBoard, clearBoard, displayBoard };
 })();
 
 // contains game logic
 const Game = (() => {
-  // called by gameController.gameOver
+  // called by gameController.gameOver and boardController.displayEnd
   const fullBoard = () => {
     let fullOrNot = true;
     Board.gameBoard.forEach((space) => {
@@ -66,7 +56,7 @@ const Game = (() => {
     });
     return fullOrNot;
   };
-  // called by gameController.gameOver
+  // called by gameController.gameOver and boardController.displayEnd
   const winningGame = () => {
     return winViaRow() || winViaColumn() || winViaDiagonal();
   };
@@ -107,25 +97,50 @@ const Game = (() => {
 
 // contains gameplay methods
 const gameController = (() => {
-  let numPlayers = ""
-  const chooseGameFormat = () => {
+  let numPlayers = "";
+  let firstPlayer = "";
+  // sets up and starts game, depending on user input
+  const startGame = () => {
+    currentPlayer = player1;
+    boardController.clearBoard();
+    boardController.displayBoard();
+    boardController.enableBoard();
+    selectNumberOfPlayers();
+    if (numPlayers === "1") {
+      selectFirstPlayer();
+      if (firstPlayer === "computer") {
+        alert(player1.name + " makes their move!");
+        computerMove();
+        switchCurrentPlayer();
+      } else {
+        alert("Make your move, " + player1.name + " !");
+        boardController.clearBoard();
+      }
+      boardController.displayBoard();
+    }
+  }
+  const selectNumberOfPlayers = () => {
     numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
     while (numPlayers !== "1" && numPlayers !== "2") {
       numPlayers = prompt("Please enter 1 or 2");
     };
-    boardController.clearBoard();
-    boardController.enableBoard();
-    boardController.displayBoard();
+    gameController.numPlayers = numPlayers;
   }
-  // check for end conditions - called by boardController.checkForAndDisplayEnd
+  const selectFirstPlayer = () => {
+    humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
+    while (humanPlayer !== "1" && humanPlayer !== "2") {
+      humanPlayer = prompt("Please enter 1 or 2");
+    };
+    humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer"
+  }
+  // check for end conditions - called by gameController.playMove
   const gameOver = () => {
-    if (Game.winningGame()) {
-      return "win";
-    } else if (Game.fullBoard()) {
-      return "tie";
+    if (Game.winningGame() || Game.fullBoard()) {
+      return true;
+    } else {
+      return false;
     }
   };
-  // switch the current player - called by Player.playMove each time it is triggered
   const switchCurrentPlayer = () => {
     if (currentPlayer === player1) {
       currentPlayer = player2;
@@ -137,15 +152,38 @@ const gameController = (() => {
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
-      boardController.checkForAndDisplayEnd();
+      if (gameOver()) {
+        boardController.disableBoard();
+        boardController.displayBoard();
+        boardController.displayEnd();
+      }
       switchCurrentPlayer();
     }
-    if (gameOver() === "win" || gameOver() === "tie") {
-      boardController.disableBoard();
+    if (gameController.numPlayers === "1" && !gameOver()) {
+      computerMove();
+      if (gameOver()) {
+        boardController.disableBoard();
+        boardController.displayBoard();
+        boardController.displayEnd();
+      }
+      switchCurrentPlayer();
     }
     boardController.displayBoard();
   }
-  return { numPlayers, chooseGameFormat, gameOver, switchCurrentPlayer, playMove };
+  const computerMove = () => {
+    // from https://stackoverflow.com/questions/47917535/get-indexes-of-filtered-array-items
+    const availableMoves = Board.gameBoard.reduce(function(acc, curr, index) {
+      if (curr === "") {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
+    // from https://stackoverflow.com/questions/4550505/getting-a-random-value-from-a-javascript-array
+    const move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    boardController.placeSymbol(move, currentPlayer.symbol);
+  }
+  return { numPlayers, firstPlayer, startGame, selectNumberOfPlayers, selectFirstPlayer,
+           gameOver, switchCurrentPlayer, playMove, computerMove };
 })();
 
 // game player objects - two will be created below
@@ -156,10 +194,4 @@ const Player = (name, symbol) => {
 // initialization of players / current player / board and button
 const player1 = Player("Baby Yoda", "X");
 const player2 = Player("Luke Skywalker", "O");
-currentPlayer = player1;
-boardController.disableBoard();
-boardController.addNewGameButton();
-if (gameController.numPlayers === "1") {
-  alert("Make your move, Baby Yoda!");
-}
-
+let currentPlayer = player1;
