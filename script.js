@@ -42,7 +42,7 @@ const boardController = (() => {
     }
   };
   const gameOverDisplay = () => {
-    if (gameOver(Board.gameBoard)) {
+    if (gameController.gameOver(Board.gameBoard)) {
       disableBoard();
       displayBoard();
       displayEnd(Board.gameBoard);
@@ -230,11 +230,27 @@ const AI = (() => {
 
   // give the heuristic value of a node (win, lose, or neither)
   const heuristicValue = (node) => {
-    // to be completed
+    if (Game.winningGame(node)) {
+      if (currentPlayer === player1) {
+        return 1;
+      } else {
+        return -1;
+      }
+    } else {
+      return 0;
+    }
   }
   // find the children of a node (all board states that could be played next)
   const childrenOf = (node) => {
-    // to be completed
+    let children = [];
+    node.forEach((space, index) => {
+      if (space === "") {
+        let temp = node.map(el => el);
+        currentPlayer === player1 ? temp[index] = "X" : temp[index] = "O";
+        children.push(temp);
+      }
+    });
+    return children;
   }
   return { minimax, isTerminal, heuristicValue, childrenOf };
 })();
