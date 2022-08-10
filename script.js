@@ -6,15 +6,15 @@ const Board = (() => {
 
 // contains board display methods
 const boardController = (() => {
-  // called by playMove Player method
+  // called by gameController.playMove
   const placeSymbol = (space, symbol) => {
     Board.gameBoard[space] = symbol;
   };
-  // called by playMove Player method
-  const displayEnd = () => {
-    if (Game.winningGame()) {
+  // called by gameController.playMove
+  const displayEnd = (board) => {
+    if (Game.winningGame(board)) {
       alert("Game Over - " + currentPlayer.name + " wins!");
-    } else if (Game.fullBoard()) {
+    } else if (Game.fullBoard(board)) {
       alert("Game Over - Tie");
     }
   };
@@ -47,9 +47,9 @@ const boardController = (() => {
 // contains game logic
 const Game = (() => {
   // called by gameController.gameOver and boardController.displayEnd
-  const fullBoard = () => {
+  const fullBoard = (board) => {
     let fullOrNot = true;
-    Board.gameBoard.forEach((space) => {
+    board.forEach((space) => {
       if (space === "") {
         fullOrNot = false;
       }
@@ -57,40 +57,40 @@ const Game = (() => {
     return fullOrNot;
   };
   // called by gameController.gameOver and boardController.displayEnd
-  const winningGame = () => {
-    return winViaRow() || winViaColumn() || winViaDiagonal();
+  const winningGame = (board) => {
+    return winViaRow(board) || winViaColumn(board) || winViaDiagonal(board);
   };
   // called by winningGame
-  const winViaRow = () => {
+  const winViaRow = (board) => {
     let winOrNot = false;
     for (let i = 0; i < 9; i += 3) {
-      if (Board.gameBoard[i] != "" &&
-          Board.gameBoard[i] === Board.gameBoard[i + 1] &&
-          Board.gameBoard[i + 1] === Board.gameBoard[i + 2]) {
+      if (board[i] != "" &&
+          board[i] === board[i + 1] &&
+          board[i + 1] === board[i + 2]) {
         winOrNot = true;
       }
     }
     return winOrNot;
   };
   // called by winningGame
-  const winViaColumn = () => {
+  const winViaColumn = (board) => {
     let winOrNot = false;
     for (let i = 0; i < 3; i += 1) {
-      if (Board.gameBoard[i] != "" &&
-          Board.gameBoard[i] === Board.gameBoard[i + 3] &&
-          Board.gameBoard[i + 3] === Board.gameBoard[i + 6]) {
+      if (board[i] != "" &&
+          board[i] === board[i + 3] &&
+          board[i + 3] === board[i + 6]) {
         winOrNot = true;
       }
     }
     return winOrNot;
   };
   // called by winningGame
-  const winViaDiagonal = () => {
-    return Board.gameBoard[4] != "" &&
-            (Board.gameBoard[0] === Board.gameBoard[4] &&
-             Board.gameBoard[4] === Board.gameBoard[8] ||
-             Board.gameBoard[2] === Board.gameBoard[4] &&
-             Board.gameBoard[4] === Board.gameBoard[6]);
+  const winViaDiagonal = (board) => {
+    return board[4] != "" &&
+            (board[0] === board[4] &&
+             board[4] === board[8] ||
+             board[2] === board[4] &&
+             board[4] === board[6]);
   };
   return { fullBoard, winningGame, winViaRow, winViaColumn, winViaDiagonal };
 })();
@@ -134,8 +134,8 @@ const gameController = (() => {
     humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer"
   }
   // check for end conditions - called by gameController.playMove
-  const gameOver = () => {
-    if (Game.winningGame() || Game.fullBoard()) {
+  const gameOver = (board) => {
+    if (Game.winningGame(board) || Game.fullBoard(board)) {
       return true;
     } else {
       return false;
@@ -152,19 +152,19 @@ const gameController = (() => {
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
-      if (gameOver()) {
+      if (gameOver(Board.gameBoard)) {
         boardController.disableBoard();
         boardController.displayBoard();
-        boardController.displayEnd();
+        boardController.displayEnd(Board.gameBoard);
       }
       switchCurrentPlayer();
     }
-    if (gameController.numPlayers === "1" && !gameOver()) {
+    if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
       computerMove();
-      if (gameOver()) {
+      if (gameOver(Board.gameBoard)) {
         boardController.disableBoard();
         boardController.displayBoard();
-        boardController.displayEnd();
+        boardController.displayEnd(Board.gameBoard);
       }
       switchCurrentPlayer();
     }
