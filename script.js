@@ -185,6 +185,64 @@ const gameController = (() => {
   return { numPlayers, firstPlayer, startGame, selectNumberOfPlayers, selectFirstPlayer,
            gameOver, switchCurrentPlayer, playMove, computerMove };
 })();
+const AI = (() => {
+  /* minimax pseudocode below taken from https://en.wikipedia.org/wiki/Minimax
+
+  function  minimax( node, depth, maximizingPlayer ) is
+      if depth = 0 or node is a terminal node then
+          return the heuristic value of node
+      if maximizingPlayer then
+          value := −∞
+          for each child of node do
+              value := max(value, minimax(child, depth − 1, FALSE))
+          return value
+      else (* minimizing player *)
+          value := +∞
+          for each child of node do
+              value := min( value, minimax( child, depth − 1, TRUE ) )
+          return value
+  */
+
+  // taken from the pseudocode above
+  // a node is an array representing the gameboard state
+  // depth will start at 9
+  // maximizingPlayer will be true to start
+  const minimax = (node, depth, maximizingPlayer) => {
+    if (depth === 0 || isTerminal(node)) {
+      return heuristicValue(node);
+    }
+    if (maximizingPlayer) {
+      let value = -Infinity;
+      childrenOf(node).forEach((child) => {
+        value = Math.max(value, minimax(child), depth - 1, false)
+      });
+      return value;
+    } else {
+      let value = Infinity;
+      childrenOf(node).forEach((child) => {
+        value = Math.min(value, minimax(child), depth - 1, true)
+      });
+      return value;
+    }
+  }
+
+  // nodes are gameboard arrays
+
+  // determine if a node is a terminal node (win or tie)
+  const isTerminal = (node) => {
+    return gameController.gameOver(node);
+  }
+
+  // give the heuristic value of a node (win, lose, or neither)
+  const heuristicValue = (node) => {
+    // to be completed
+  }
+  // find the children of a node (all board states that could be played next)
+  const childrenOf = (node) => {
+    // to be completed
+  }
+  return { minimax, isTerminal, heuristicValue, childrenOf };
+})();
 
 // game player objects - two will be created below
 const Player = (name, symbol) => {
