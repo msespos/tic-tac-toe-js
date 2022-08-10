@@ -41,7 +41,14 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  return { placeSymbol, displayEnd, disableBoard, enableBoard, clearBoard, displayBoard };
+  const gameOverDisplay = () => {
+    if (gameOver(Board.gameBoard)) {
+      disableBoard();
+      displayBoard();
+      displayEnd(Board.gameBoard);
+    }
+  }
+  return { placeSymbol, displayEnd, disableBoard, enableBoard, clearBoard, displayBoard, gameOverDisplay };
 })();
 
 // contains game logic
@@ -135,11 +142,7 @@ const gameController = (() => {
   }
   // check for end conditions - called by gameController.playMove
   const gameOver = (board) => {
-    if (Game.winningGame(board) || Game.fullBoard(board)) {
-      return true;
-    } else {
-      return false;
-    }
+    return Game.winningGame(board) || Game.fullBoard(board)
   };
   const switchCurrentPlayer = () => {
     if (currentPlayer === player1) {
@@ -152,20 +155,12 @@ const gameController = (() => {
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
-      if (gameOver(Board.gameBoard)) {
-        boardController.disableBoard();
-        boardController.displayBoard();
-        boardController.displayEnd(Board.gameBoard);
-      }
+      boardController.gameOverDisplay();
       switchCurrentPlayer();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
       computerMove();
-      if (gameOver(Board.gameBoard)) {
-        boardController.disableBoard();
-        boardController.displayBoard();
-        boardController.displayEnd(Board.gameBoard);
-      }
+      boardController.gameOverDisplay();
       switchCurrentPlayer();
     }
     boardController.displayBoard();
