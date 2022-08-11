@@ -209,13 +209,13 @@ const AI = (() => {
     if (maximizingPlayer) {
       let value = -Infinity;
       childrenOf(node).forEach((child) => {
-        value = Math.max(value, minimax(child), depth - 1, false)
+        value = Math.max(value, minimax(child, depth - 1, false))
       });
       return value;
     } else {
       let value = Infinity;
       childrenOf(node).forEach((child) => {
-        value = Math.min(value, minimax(child), depth - 1, true)
+        value = Math.min(value, minimax(child, depth - 1, true))
       });
       return value;
     }
