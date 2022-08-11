@@ -43,6 +43,7 @@ a, h6 {
   display: flex;
   justify-content: center;
   align-items: center;
+  pointer-events: none;
 }
 
 #new-game-button {
