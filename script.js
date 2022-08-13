@@ -1,6 +1,6 @@
 // contains board array
 const Board = (() => {
-  let gameBoard = ["O", "", "", "O", "", "", "X", "X", ""];
+  let gameBoard = ["", "", "", "", "", "", "", "", ""];
   return { gameBoard };
 })();
 
@@ -109,7 +109,7 @@ const gameController = (() => {
   // sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
-    //boardController.clearBoard();
+    boardController.clearBoard();
     boardController.displayBoard();
     boardController.enableBoard();
     selectNumberOfPlayers();
@@ -121,26 +121,24 @@ const gameController = (() => {
         switchCurrentPlayer();
       } else {
         alert("Make your move, " + player1.name + " !");
-        //boardController.clearBoard();
+        boardController.clearBoard();
       }
       boardController.displayBoard();
     }
   }
   const selectNumberOfPlayers = () => {
-    //numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
-    //while (numPlayers !== "1" && numPlayers !== "2") {
-      //numPlayers = prompt("Please enter 1 or 2");
-    //};
-    //gameController.numPlayers = numPlayers;
-    gameController.numPlayers = "1";
+    numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
+    while (numPlayers !== "1" && numPlayers !== "2") {
+      numPlayers = prompt("Please enter 1 or 2");
+    };
+    gameController.numPlayers = numPlayers;
   }
   const selectFirstPlayer = () => {
-    //humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
-    //while (humanPlayer !== "1" && humanPlayer !== "2") {
-    //  humanPlayer = prompt("Please enter 1 or 2");
-    //};
-    //humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer"
-    firstPlayer = "human";
+    humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
+    while (humanPlayer !== "1" && humanPlayer !== "2") {
+      humanPlayer = prompt("Please enter 1 or 2");
+    };
+    humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
   }
   // check for end conditions - called by gameController.playMove
   const gameOver = (board) => {
@@ -175,12 +173,10 @@ const gameController = (() => {
       }
       return acc;
     }, []);
-    switchCurrentPlayer();
-    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 2, true));
-    //console.log("minimaxesOfChildren: " + minimaxesOfChildren);
-    switchCurrentPlayer();
+    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 5, true));
+    console.log("minimaxesOfChildren: " + minimaxesOfChildren);
     let max = Math.max(...minimaxesOfChildren);
-    //console.log("max of minimaxesOfChildren: " + max);
+    console.log("max of minimaxesOfChildren: " + max);
     let move = availableMoves[minimaxesOfChildren.indexOf(max)];
     boardController.placeSymbol(move, currentPlayer.symbol);
   }
@@ -189,25 +185,25 @@ const gameController = (() => {
 })();
 const AI = (() => {
   // a node is an array representing the gameboard state
-  // depth will start at 9
   // maximizingPlayer will start at true
   const minimax = (node, depth, maximizingPlayer) => {
-    console.log(node, depth, maximizingPlayer, "start");
     if (depth === 0 || isTerminal(node)) {
-      console.log(node, depth, maximizingPlayer, "returning heuristic", heuristicValue(node, false));
+      console.log(node, depth, maximizingPlayer, "returning heuristic", heuristicValue(node, maximizingPlayer));
       return heuristicValue(node, maximizingPlayer);
     }
     if (maximizingPlayer) {
-      let value = -1;
+      let value = 1;
       childrenOf(node, true).forEach((child) => {
-        value = Math.max(value, minimax(child, depth - 1, false))
+        value = Math.min(value, minimax(child, depth - 1, false));
       });
+      console.log(node, depth, "maximizingPlayer return value", value);
       return value;
     } else {
-      let value = 1;
+      let value = -1;
       childrenOf(node, false).forEach((child) => {
-        value = Math.min(value, minimax(child, depth - 1, true))
+        value = Math.max(value, minimax(child, depth - 1, true));
       });
+      console.log(node, depth, "minimizingPlayer return value", value);
       return value;
     }
   }
@@ -240,7 +236,7 @@ const AI = (() => {
     });
     return children;
   }
-  return { minimax, isTerminal, heuristicValue, childrenOf };
+  return { minimax, childrenOf };
 })();
 
 // game player objects - two will be created below
