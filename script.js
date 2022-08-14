@@ -1,6 +1,6 @@
 // contains board array
 const Board = (() => {
-  let gameBoard = ["", "", "", "", "", "", "", "", ""];
+  let gameBoard = ["O", "", "", "O", "", "", "X", "X", ""];
   return { gameBoard };
 })();
 
@@ -23,16 +23,16 @@ const boardController = (() => {
       const box = document.getElementById("box-" + (i + 1));
       box.style.pointerEvents = "none";
     }
-  }
+  };
   const enableBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
       box.style.pointerEvents = "auto";
     }
-  }
+  };
   const clearBoard = () => {
     Board.gameBoard.fill("");
-  }
+  };
   const displayBoard = () => {
     for (i = 0; i < 9; i++) {
       const box = document.getElementById("box-" + (i + 1));
@@ -47,8 +47,9 @@ const boardController = (() => {
       displayBoard();
       displayEnd(Board.gameBoard);
     }
-  }
-  return { placeSymbol, displayEnd, disableBoard, enableBoard, clearBoard, displayBoard, gameOverDisplay };
+  };
+  return { placeSymbol, displayEnd, disableBoard, enableBoard, clearBoard, 
+           displayBoard, gameOverDisplay };
 })();
 
 // contains game logic
@@ -109,7 +110,7 @@ const gameController = (() => {
   // sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
-    boardController.clearBoard();
+    //boardController.clearBoard();
     boardController.displayBoard();
     boardController.enableBoard();
     selectNumberOfPlayers();
@@ -120,26 +121,28 @@ const gameController = (() => {
         computerMove();
         switchCurrentPlayer();
       } else {
-        alert("Make your move, " + player1.name + " !");
-        boardController.clearBoard();
+        //alert("Make your move, " + player1.name + " !");
+        //boardController.clearBoard();
       }
       boardController.displayBoard();
     }
-  }
+  };
   const selectNumberOfPlayers = () => {
-    numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
-    while (numPlayers !== "1" && numPlayers !== "2") {
-      numPlayers = prompt("Please enter 1 or 2");
-    };
-    gameController.numPlayers = numPlayers;
-  }
+    //numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
+    //while (numPlayers !== "1" && numPlayers !== "2") {
+      //numPlayers = prompt("Please enter 1 or 2");
+    //};
+    //gameController.numPlayers = numPlayers;
+    gameController.numPlayers = "1";
+  };
   const selectFirstPlayer = () => {
-    humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
-    while (humanPlayer !== "1" && humanPlayer !== "2") {
-      humanPlayer = prompt("Please enter 1 or 2");
-    };
-    humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
-  }
+    //humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
+    //while (humanPlayer !== "1" && humanPlayer !== "2") {
+      //humanPlayer = prompt("Please enter 1 or 2");
+    //};
+    //humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
+    firstPlayer = "human";
+  };
   // check for end conditions - called by gameController.playMove
   const gameOver = (board) => {
     return Game.winningGame(board) || Game.fullBoard(board)
@@ -159,12 +162,13 @@ const gameController = (() => {
       switchCurrentPlayer();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
+      console.log("HELLO?")
       computerMove();
       boardController.gameOverDisplay();
       switchCurrentPlayer();
     }
     boardController.displayBoard();
-  }
+  };
   const computerMove = () => {
     // from https://stackoverflow.com/questions/47917535/get-indexes-of-filtered-array-items
     const availableMoves = Board.gameBoard.reduce(function(acc, curr, index) {
@@ -173,13 +177,13 @@ const gameController = (() => {
       }
       return acc;
     }, []);
-    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 5, true));
+    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 1, true));
     console.log("minimaxesOfChildren: " + minimaxesOfChildren);
     let max = Math.max(...minimaxesOfChildren);
     console.log("max of minimaxesOfChildren: " + max);
     let move = availableMoves[minimaxesOfChildren.indexOf(max)];
     boardController.placeSymbol(move, currentPlayer.symbol);
-  }
+  };
   return { numPlayers, firstPlayer, startGame, selectNumberOfPlayers, selectFirstPlayer,
            gameOver, switchCurrentPlayer, playMove, computerMove };
 })();
@@ -192,26 +196,26 @@ const AI = (() => {
       return heuristicValue(node, maximizingPlayer);
     }
     if (maximizingPlayer) {
-      let value = 1;
+      let value = -Infinity;
       childrenOf(node, true).forEach((child) => {
-        value = Math.min(value, minimax(child, depth - 1, false));
+        value = Math.max(value, minimax(child, depth - 1, false));
       });
       console.log(node, depth, "maximizingPlayer return value", value);
       return value;
     } else {
-      let value = -1;
+      let value = Infinity;
       childrenOf(node, false).forEach((child) => {
-        value = Math.max(value, minimax(child, depth - 1, true));
+        value = Math.min(value, minimax(child, depth - 1, true));
       });
       console.log(node, depth, "minimizingPlayer return value", value);
       return value;
     }
-  }
+  };
   // nodes are gameboard arrays
   // determine if a node is a terminal node (win or tie)
   const isTerminal = (node) => {
     return gameController.gameOver(node);
-  }
+  };
   // give the heuristic value of a node (win, lose, or neither)
   const heuristicValue = (node, maximizingPlayer) => {
     if (Game.winningGame(node)) {
@@ -223,7 +227,7 @@ const AI = (() => {
     } else {
       return 0;
     }
-  }
+  };
   // find the children of a node (all board states that could be played next)
   const childrenOf = (node, maximizingPlayer) => {
     let children = [];
