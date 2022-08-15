@@ -1,6 +1,6 @@
 // contains board array
 const Board = (() => {
-  let gameBoard = ["O", "", "", "O", "", "", "X", "X", ""];
+  let gameBoard = ["", "", "", "", "", "", "", "", ""];
   return { gameBoard };
 })();
 
@@ -107,10 +107,10 @@ const Game = (() => {
 const gameController = (() => {
   let numPlayers = "";
   let firstPlayer = "";
-  // sets up and starts game, depending on user input
+  // triggered by New Game button - sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
-    //boardController.clearBoard();
+    boardController.clearBoard();
     boardController.displayBoard();
     boardController.enableBoard();
     selectNumberOfPlayers();
@@ -121,27 +121,25 @@ const gameController = (() => {
         computerMove();
         switchCurrentPlayer();
       } else {
-        //alert("Make your move, " + player1.name + " !");
-        //boardController.clearBoard();
+        alert("Make your move, " + player1.name + "!");
+        boardController.clearBoard();
       }
       boardController.displayBoard();
     }
   };
   const selectNumberOfPlayers = () => {
-    //numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
-    //while (numPlayers !== "1" && numPlayers !== "2") {
-      //numPlayers = prompt("Please enter 1 or 2");
-    //};
-    //gameController.numPlayers = numPlayers;
-    gameController.numPlayers = "1";
+    numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
+    while (numPlayers !== "1" && numPlayers !== "2") {
+      numPlayers = prompt("Please enter 1 or 2");
+    };
+    gameController.numPlayers = numPlayers;
   };
   const selectFirstPlayer = () => {
-    //humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
-    //while (humanPlayer !== "1" && humanPlayer !== "2") {
-      //humanPlayer = prompt("Please enter 1 or 2");
-    //};
-    //humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
-    firstPlayer = "human";
+    humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
+    while (humanPlayer !== "1" && humanPlayer !== "2") {
+      humanPlayer = prompt("Please enter 1 or 2");
+    };
+    humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
   };
   // check for end conditions - called by gameController.playMove
   const gameOver = (board) => {
@@ -162,7 +160,6 @@ const gameController = (() => {
       switchCurrentPlayer();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
-      console.log("HELLO?")
       computerMove();
       boardController.gameOverDisplay();
       switchCurrentPlayer();
@@ -177,7 +174,7 @@ const gameController = (() => {
       }
       return acc;
     }, []);
-    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 1, true));
+    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 5, false, firstPlayer));
     console.log("minimaxesOfChildren: " + minimaxesOfChildren);
     let max = Math.max(...minimaxesOfChildren);
     console.log("max of minimaxesOfChildren: " + max);
@@ -189,23 +186,23 @@ const gameController = (() => {
 })();
 const AI = (() => {
   // a node is an array representing the gameboard state
-  // maximizingPlayer will start at true
-  const minimax = (node, depth, maximizingPlayer) => {
+  // maximizingPlayer will start at false
+  const minimax = (node, depth, maximizingPlayer, firstPlayer) => {
     if (depth === 0 || isTerminal(node)) {
-      console.log(node, depth, maximizingPlayer, "returning heuristic", heuristicValue(node, maximizingPlayer));
-      return heuristicValue(node, maximizingPlayer);
+      console.log(node, depth, maximizingPlayer, "returning heuristic", heuristicValue(node, firstPlayer));
+      return heuristicValue(node, firstPlayer);
     }
     if (maximizingPlayer) {
       let value = -Infinity;
       childrenOf(node, true).forEach((child) => {
-        value = Math.max(value, minimax(child, depth - 1, false));
+        value = Math.max(value, minimax(child, depth - 1, false, firstPlayer));
       });
       console.log(node, depth, "maximizingPlayer return value", value);
       return value;
     } else {
       let value = Infinity;
       childrenOf(node, false).forEach((child) => {
-        value = Math.min(value, minimax(child, depth - 1, true));
+        value = Math.min(value, minimax(child, depth - 1, true, firstPlayer));
       });
       console.log(node, depth, "minimizingPlayer return value", value);
       return value;
@@ -217,31 +214,53 @@ const AI = (() => {
     return gameController.gameOver(node);
   };
   // give the heuristic value of a node (win, lose, or neither)
-  const heuristicValue = (node, maximizingPlayer) => {
+  const heuristicValue = (node, firstPlayer) => {
     if (Game.winningGame(node)) {
-      if (maximizingPlayer) {
-        return 1;
+      if (firstPlayer === "computer") {
+        if (countSymbol(node, "X") > countSymbol(node, "O")) {
+          return 1;
+        } else {
+          return -1;
+        }
       } else {
-        return -1;
+        if (countSymbol(node, "X") > countSymbol(node, "O")) {
+          return -1;
+        } else {
+          return 1;
+        }
       }
     } else {
       return 0;
     }
   };
   // find the children of a node (all board states that could be played next)
-  const childrenOf = (node, maximizingPlayer) => {
+  const childrenOf = (node) => {
     let children = [];
     node.forEach((space, index) => {
       if (space === "") {
         let temp = node.map(el => el);
-        maximizingPlayer ? temp[index] = "X" : temp[index] = "O";
+        if (countSymbol(node, "X") > countSymbol(node, "O")) {
+          temp[index] = "O";
+        } else {
+          temp[index] = "X";
+        }
         children.push(temp);
       }
     });
     return children;
-  }
+  };
+  const countSymbol = (node, symbol) => {
+    let count = 0;
+    for (let i = 0; i < node.length; i++){
+      if (node[i] == symbol) {
+        count++;
+      }
+    }
+    return count;
+  };
   return { minimax, childrenOf };
 })();
+
 
 // game player objects - two will be created below
 const Player = (name, symbol) => {
