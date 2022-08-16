@@ -117,7 +117,7 @@ const gameController = (() => {
       selectFirstPlayer();
       if (firstPlayer === "computer") {
         alert(player1.name + " makes their move!");
-        computerMove();
+        AI.computerMove(firstPlayer);
         switchCurrentPlayer();
       } else {
         alert("Make your move, " + player1.name + "!");
@@ -161,31 +161,33 @@ const gameController = (() => {
       switchCurrentPlayer();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
-      computerMove();
+      AI.computerMove(firstPlayer);
       boardController.gameOverDisplay();
       switchCurrentPlayer();
     }
     boardController.displayBoard();
   };
-  const computerMove = () => {
-    // from https://stackoverflow.com/questions/47917535/get-indexes-of-filtered-array-items
-    const availableMoves = Board.gameBoard.reduce(function(acc, curr, index) {
-      if (curr === "") {
-        acc.push(index);
-      }
-      return acc;
-    }, []);
-    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 9, false, firstPlayer));
-    let max = Math.max(...minimaxesOfChildren);
-    let move = availableMoves[minimaxesOfChildren.indexOf(max)];
-    boardController.placeSymbol(move, currentPlayer.symbol);
-  };
   return { numPlayers, firstPlayer, startGame, gameOver, playMove };
 })();
+
 const AI = (() => {
   // a node is an array representing the gameboard state
   // maximizingPlayer will start at false
   // called by gameController.computerMove
+  const computerMove = (firstPlayer) => {
+    // from https://stackoverflow.com/questions/47917535/get-indexes-of-filtered-array-items
+    let availableMoves = [];
+    Board.gameBoard.forEach((space, index) => {
+      if (space === "") {
+        availableMoves.push(index);
+      }
+    });
+    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard)
+                                .map(child => AI.minimax(child, 9, false, firstPlayer));
+    let max = Math.max(...minimaxesOfChildren);
+    let move = availableMoves[minimaxesOfChildren.indexOf(max)];
+    boardController.placeSymbol(move, currentPlayer.symbol);
+  };
   const minimax = (node, depth, maximizingPlayer, firstPlayer) => {
     if (depth === 0 || isTerminal(node)) {
       return heuristicValue(node, firstPlayer);
@@ -254,7 +256,7 @@ const AI = (() => {
     }
     return count;
   };
-  return { minimax, childrenOf };
+  return { computerMove, minimax, childrenOf };
 })();
 
 // game player objects - two will be created below
