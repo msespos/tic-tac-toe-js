@@ -175,7 +175,6 @@ const AI = (() => {
   // maximizingPlayer will start at false
   // called by gameController.computerMove
   const computerMove = (firstPlayer) => {
-    // from https://stackoverflow.com/questions/47917535/get-indexes-of-filtered-array-items
     let availableMoves = [];
     Board.gameBoard.forEach((space, index) => {
       if (space === "") {
@@ -215,17 +214,9 @@ const AI = (() => {
   const heuristicValue = (node, firstPlayer) => {
     if (Game.winningGame(node)) {
       if (firstPlayer === "computer") {
-        if (countSymbol(node, "X") > countSymbol(node, "O")) {
-          return 1;
-        } else {
-          return -1;
-        }
+        return winOrLoss(xJustWent(node));
       } else {
-        if (countSymbol(node, "X") > countSymbol(node, "O")) {
-          return -1;
-        } else {
-          return 1;
-        }
+        return winOrLoss(!xJustWent(node));
       }
     } else {
       return 0;
@@ -237,7 +228,7 @@ const AI = (() => {
     node.forEach((space, index) => {
       if (space === "") {
         let temp = node.map(el => el);
-        if (countSymbol(node, "X") > countSymbol(node, "O")) {
+        if (xJustWent(node)) {
           temp[index] = "O";
         } else {
           temp[index] = "X";
@@ -247,6 +238,19 @@ const AI = (() => {
     });
     return children;
   };
+  // helper function for heuristicValue
+  const winOrLoss = (truthValue) => {
+    if (truthValue) {
+      return 1;
+    } else {
+      return -1;
+    }
+  }
+  // helper function for heuristicValue and childrenOf
+  const xJustWent = (node) => {
+    return countSymbol(node, "X") > countSymbol(node, "O");
+  };
+  // helper function for xJustWent
   const countSymbol = (node, symbol) => {
     let count = 0;
     for (let i = 0; i < node.length; i++){
