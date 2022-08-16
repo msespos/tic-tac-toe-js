@@ -48,8 +48,7 @@ const boardController = (() => {
       displayEnd(Board.gameBoard);
     }
   };
-  return { placeSymbol, displayEnd, disableBoard, enableBoard, clearBoard, 
-           displayBoard, gameOverDisplay };
+  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, gameOverDisplay };
 })();
 
 // contains game logic
@@ -100,7 +99,7 @@ const Game = (() => {
              board[2] === board[4] &&
              board[4] === board[6]);
   };
-  return { fullBoard, winningGame, winViaRow, winViaColumn, winViaDiagonal };
+  return { fullBoard, winningGame };
 })();
 
 // contains gameplay methods
@@ -127,6 +126,7 @@ const gameController = (() => {
       boardController.displayBoard();
     }
   };
+  // called by startGame
   const selectNumberOfPlayers = () => {
     numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
     while (numPlayers !== "1" && numPlayers !== "2") {
@@ -134,6 +134,7 @@ const gameController = (() => {
     };
     gameController.numPlayers = numPlayers;
   };
+  // called by startGame
   const selectFirstPlayer = () => {
     humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
     while (humanPlayer !== "1" && humanPlayer !== "2") {
@@ -141,7 +142,7 @@ const gameController = (() => {
     };
     humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
   };
-  // check for end conditions - called by gameController.playMove
+  // check for end conditions - called by playMove
   const gameOver = (board) => {
     return Game.winningGame(board) || Game.fullBoard(board)
   };
@@ -175,21 +176,18 @@ const gameController = (() => {
       return acc;
     }, []);
     let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 5, false, firstPlayer));
-    console.log("minimaxesOfChildren: " + minimaxesOfChildren);
     let max = Math.max(...minimaxesOfChildren);
-    console.log("max of minimaxesOfChildren: " + max);
     let move = availableMoves[minimaxesOfChildren.indexOf(max)];
     boardController.placeSymbol(move, currentPlayer.symbol);
   };
-  return { numPlayers, firstPlayer, startGame, selectNumberOfPlayers, selectFirstPlayer,
-           gameOver, switchCurrentPlayer, playMove, computerMove };
+  return { numPlayers, firstPlayer, startGame, gameOver, playMove };
 })();
 const AI = (() => {
   // a node is an array representing the gameboard state
   // maximizingPlayer will start at false
+  // called by gameController.computerMove
   const minimax = (node, depth, maximizingPlayer, firstPlayer) => {
     if (depth === 0 || isTerminal(node)) {
-      console.log(node, depth, maximizingPlayer, "returning heuristic", heuristicValue(node, firstPlayer));
       return heuristicValue(node, firstPlayer);
     }
     if (maximizingPlayer) {
@@ -197,23 +195,21 @@ const AI = (() => {
       childrenOf(node, true).forEach((child) => {
         value = Math.max(value, minimax(child, depth - 1, false, firstPlayer));
       });
-      console.log(node, depth, "maximizingPlayer return value", value);
       return value;
     } else {
       let value = Infinity;
       childrenOf(node, false).forEach((child) => {
         value = Math.min(value, minimax(child, depth - 1, true, firstPlayer));
       });
-      console.log(node, depth, "minimizingPlayer return value", value);
       return value;
     }
   };
   // nodes are gameboard arrays
-  // determine if a node is a terminal node (win or tie)
+  // called by minimax - determines if a node is a terminal node (win or tie)
   const isTerminal = (node) => {
     return gameController.gameOver(node);
   };
-  // give the heuristic value of a node (win, lose, or neither)
+  // called by minimax - gives the heuristic value of a node (win, lose, or neither)
   const heuristicValue = (node, firstPlayer) => {
     if (Game.winningGame(node)) {
       if (firstPlayer === "computer") {
@@ -260,7 +256,6 @@ const AI = (() => {
   };
   return { minimax, childrenOf };
 })();
-
 
 // game player objects - two will be created below
 const Player = (name, symbol) => {
