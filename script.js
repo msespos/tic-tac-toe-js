@@ -175,7 +175,7 @@ const gameController = (() => {
       }
       return acc;
     }, []);
-    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 5, false, firstPlayer));
+    let minimaxesOfChildren = AI.childrenOf(Board.gameBoard).map(child => AI.minimax(child, 9, false, firstPlayer));
     let max = Math.max(...minimaxesOfChildren);
     let move = availableMoves[minimaxesOfChildren.indexOf(max)];
     boardController.placeSymbol(move, currentPlayer.symbol);
