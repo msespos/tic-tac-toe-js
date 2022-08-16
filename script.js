@@ -41,14 +41,14 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  const viewAtEndOfGame = () => {
+  const showEndOfGame = () => {
     if (gameController.gameOver(Board.gameBoard)) {
       disableBoard();
       displayBoard();
       displayEnd(Board.gameBoard);
     }
   };
-  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, viewAtEndOfGame };
+  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, showEndOfGame };
 })();
 
 // contains game logic
@@ -157,12 +157,12 @@ const gameController = (() => {
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
-      boardController.viewAtEndOfGame();
+      boardController.showEndOfGame();
       switchCurrentPlayer();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
       AI.computerMove(firstPlayer);
-      boardController.viewAtEndOfGame();
+      boardController.showEndOfGame();
       switchCurrentPlayer();
     }
     boardController.displayBoard();
@@ -222,7 +222,7 @@ const AI = (() => {
       return 0;
     }
   };
-  // find the children of a node (all board states that could be played next)
+  // called by mininax - find the children of a node (all board states that could be played next)
   const childrenOf = (node) => {
     let children = [];
     node.forEach((space, index) => {
@@ -263,7 +263,7 @@ const AI = (() => {
   return { computerMove, minimax, childrenOf };
 })();
 
-// game player objects - two will be created below
+// game player objects - two are created below
 const Player = (name, symbol) => {
   return { name, symbol };
 };
