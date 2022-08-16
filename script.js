@@ -41,14 +41,14 @@ const boardController = (() => {
       box.appendChild(token);
     }
   };
-  const gameOverDisplay = () => {
+  const viewAtEndOfGame = () => {
     if (gameController.gameOver(Board.gameBoard)) {
       disableBoard();
       displayBoard();
       displayEnd(Board.gameBoard);
     }
   };
-  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, gameOverDisplay };
+  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, viewAtEndOfGame };
 })();
 
 // contains game logic
@@ -157,12 +157,12 @@ const gameController = (() => {
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
-      boardController.gameOverDisplay();
+      boardController.viewAtEndOfGame();
       switchCurrentPlayer();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
       AI.computerMove(firstPlayer);
-      boardController.gameOverDisplay();
+      boardController.viewAtEndOfGame();
       switchCurrentPlayer();
     }
     boardController.displayBoard();
