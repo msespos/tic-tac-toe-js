@@ -46,7 +46,6 @@ a, h6 {
 }
 
 .x-container, .o-container-1, .o-container-2 {
-  font-size: xxx-large;
   display: flex;
   justify-content: center;
 }
