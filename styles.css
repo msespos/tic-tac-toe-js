@@ -45,20 +45,20 @@ a, h6 {
   }
 }
 
-.x-container-1, .x-container-2, .o-container {
+.x-container, .o-container-1, .o-container-2 {
   font-size: xxx-large;
   display: flex;
   justify-content: center;
 }
 
 @media (min-width: 1366px) {
-  .o-container {
+  .o-container-1 {
     display: none;
   }
 }
 
 @media (max-width: 1366px) {
-  .x-container-2 {
+  .o-container-2 {
     display: none;
   }
 }
