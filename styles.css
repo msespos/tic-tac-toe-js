@@ -1,6 +1,18 @@
+/* 768, 1366 */
+body {
+  margin: 0;
+}
+
 * {
   font-size: xx-large;
   color: purple;
+}
+
+h1 {
+  font-size: xxx-large;
+  display: flex;
+  justify-content: center;
+  margin: 15px 0px;
 }
 
 a, h6 {
@@ -9,26 +21,53 @@ a, h6 {
 
 .container {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 40px;
 }
 
-.player {
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    gap: 0px;
+  }
+}
+
+.player-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-bottom: 100px;
 }
 
-.letter {
+@media (max-width: 768px) {
+  .player-container {
+    padding: 0px;
+  }
+}
+
+.x-container-1, .x-container-2, .o-container {
   font-size: xxx-large;
   display: flex;
   justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .o-container {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .x-container-2 {
+    display: none;
+  }
 }
 
 .board {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 50px;
+  margin: 25px 0px;
 }
 
 .row {
@@ -46,6 +85,13 @@ a, h6 {
   pointer-events: none;
 }
 
+@media (max-width: 768px) {
+  .box {
+    width: 100px;
+    height: 100px;
+  }
+}
+
 #new-game-button {
-  margin-top: 50px;
+  margin-top: 42px;
 }
