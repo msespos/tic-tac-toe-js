@@ -25,7 +25,7 @@ a, h6 {
   gap: 40px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1366px) {
   .container {
     flex-direction: column;
     gap: 0px;
@@ -39,7 +39,7 @@ a, h6 {
   padding-bottom: 100px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1366px) {
   .player-container {
     padding: 0px;
   }
@@ -51,13 +51,13 @@ a, h6 {
   justify-content: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1366px) {
   .o-container {
     display: none;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1366px) {
   .x-container-2 {
     display: none;
   }
