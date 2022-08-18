@@ -149,6 +149,8 @@ const gameController = (() => {
         boardController.clearBoard();
       }
       boardController.displayBoard();
+    } else {
+      alert("Make your move, " + player1.name + "!");
     }
   };
   // called by startGame
@@ -202,13 +204,18 @@ const gameController = (() => {
       boardController.placeSymbol(space, currentPlayer.symbol);
       boardController.showEndOfGame();
       switchCurrentPlayer();
+      boardController.displayBoard();
     }
     if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
-      AI.computerMove(firstPlayer);
-      boardController.showEndOfGame();
-      switchCurrentPlayer();
+      boardController.disableBoard();
+      setTimeout(() => {
+        AI.computerMove(firstPlayer);
+        boardController.showEndOfGame();
+        switchCurrentPlayer();
+        boardController.displayBoard();
+        boardController.enableBoard();
+      }, 750);
     }
-    boardController.displayBoard();
   };
   const getPlayerName = (number) => {
     return prompt("Player " + number + ", please enter your name:")
