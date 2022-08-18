@@ -49,20 +49,30 @@ const boardController = (() => {
     }
   };
   const placePlayerOneName = (playerOneName) => {
-    const nameholder = document.getElementById("x-container");
-    const name = document.createTextNode("Player 1 (X): " + playerOneName);
-    nameholder.appendChild(name);
+    const nameholder = document.querySelectorAll(".x-container");
+    nameholder.forEach((div) => {
+      const name = document.createTextNode("Player 1 (X): " + playerOneName);
+      div.appendChild(name);
+    });
   };
   // player two needs to append to two different divs for mobile responsiveness
   const placePlayerTwoName = (playerTwoName) => {
     const nameholder = document.querySelectorAll(".o-container-1, .o-container-2");
-    nameholder.forEach((node) => {
+    nameholder.forEach((div) => {
       const name = document.createTextNode("Player 2 (O): " + playerTwoName);
-      node.appendChild(name);
+      div.appendChild(name);
     });
   };
+  const clearNames = () => {
+    const nameholder = document.querySelectorAll(".x-container, .o-container-1, .o-container-2")
+    nameholder.forEach((div) => {
+      while(div.firstChild) {
+        div.removeChild(div.firstChild);
+      }
+    });
+  }
   return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, showEndOfGame,
-           placePlayerOneName, placePlayerTwoName };
+           placePlayerOneName, placePlayerTwoName, clearNames };
 })();
 
 // contains game logic
@@ -123,6 +133,7 @@ const gameController = (() => {
   // triggered by New Game button - sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
+    boardController.clearNames();
     boardController.clearBoard();
     boardController.displayBoard();
     boardController.enableBoard();
@@ -130,7 +141,7 @@ const gameController = (() => {
     if (numPlayers === "1") {
       selectFirstPlayer();
       if (firstPlayer === "computer") {
-        alert(player1.name + " makes their move!");
+        alert("Computer makes its move!");
         AI.computerMove(firstPlayer);
         switchCurrentPlayer();
       } else {
@@ -147,6 +158,12 @@ const gameController = (() => {
       numPlayers = prompt("Please enter 1 or 2");
     };
     gameController.numPlayers = numPlayers;
+    if (numPlayers === "2") {
+      player1.name = gameController.getPlayerName("One");
+      player2.name = gameController.getPlayerName("Two");
+      boardController.placePlayerOneName(player1.name);
+      boardController.placePlayerTwoName(player2.name);
+    }
   };
   // called by startGame
   const selectFirstPlayer = () => {
@@ -154,7 +171,17 @@ const gameController = (() => {
     while (humanPlayer !== "1" && humanPlayer !== "2") {
       humanPlayer = prompt("Please enter 1 or 2");
     };
-    humanPlayer === "1" ? firstPlayer = "human" : firstPlayer = "computer";
+    if (humanPlayer === "1") {
+      firstPlayer = "human";
+      player1.name = gameController.getPlayerName("One");
+      player2.name = "Computer";
+      boardController.placePlayerOneName(player1.name);
+    } else {
+      firstPlayer = "computer";
+      player1.name = "Computer";
+      player2.name = gameController.getPlayerName("Two");
+      boardController.placePlayerTwoName(player2.name);
+    }
   };
   // check for end conditions - called by playMove
   const gameOver = (board) => {
@@ -288,8 +315,4 @@ const Player = (name, symbol) => {
 // initialization of players / current player / board and button
 const player1 = Player("", "X");
 const player2 = Player("", "O");
-player1.name = gameController.getPlayerName("One");
-player2.name = gameController.getPlayerName("Two");
-boardController.placePlayerOneName(player1.name);
-boardController.placePlayerTwoName(player2.name);
 let currentPlayer = player1;
