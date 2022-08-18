@@ -33,6 +33,7 @@ a, h6 {
 }
 
 .player-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -45,20 +46,30 @@ a, h6 {
   }
 }
 
+@media (min-width: 1366px) {
+  .player-container-left {
+    margin-right: auto;
+  }
+
+  .player-container-right {
+    margin-left: auto;
+  }
+}
+
 .x-container, .o-container-1, .o-container-2 {
   display: flex;
   justify-content: center;
 }
 
 @media (min-width: 1366px) {
-  .o-container-1 {
+  .o-container-1, o-container-2 {
     display: none;
   }
 }
 
 @media (max-width: 1366px) {
-  .o-container-2 {
-    display: none;
+  .x-container, .o-container-1, .o-container-2 {
+    font-size: medium;
   }
 }
 
