@@ -325,3 +325,23 @@ const Player = (name, symbol) => {
 const player1 = Player("", "X");
 const player2 = Player("", "O");
 let currentPlayer = player1;
+
+// Modal JS taken from https://sabe.io/tutorials/how-to-create-modal-popup-box
+
+const modal = document.querySelector(".modal");
+const trigger = document.querySelector(".trigger");
+const closeButton = document.querySelector(".close-button");
+
+const toggleModal = () => {
+  modal.classList.toggle("show-modal");
+}
+
+const windowOnClick = (event) => {
+  if (event.target === modal) {
+    toggleModal();
+  }
+}
+
+trigger.addEventListener("click", toggleModal);
+closeButton.addEventListener("click", toggleModal);
+window.addEventListener("click", windowOnClick);

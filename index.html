@@ -31,6 +31,27 @@
         <div class="box" id="box-8" onclick="gameController.playMove(7)"></div>
         <div class="box" id="box-9" onclick="gameController.playMove(8)"></div>
       </div>
+      <!-- Modal Button (not form) HTML taken from https://sabe.io/tutorials/how-to-create-modal-popup-box -->
+      <button class="trigger">This will trigger the modal!</button>
+      <div class="modal">
+        <div class="modal-content">
+          <span class="close-button">&times;</span>
+          <form>
+            <label for="playerOneName">Player One Name:</label>
+            <input type="text" id="playerOneName" name="playerOneName" required>
+            <label for="playerTwoName">Player Two Name:</label>
+            <input type="text" id="playerTwoName" name="playerTwoName" required>
+            <div class="">
+              <input type="radio" id="whoPlaysWhom" name="whoPlaysWhom" value="playerOneVComputer">
+              <label for="playerOneVComputer">Player One (X) vs. Computer</label>
+              <input type="radio" id="whoPlaysWhom" name="whoPlaysWhom" value="computerVPlayerTwo">
+              <label for="computerVPlayerTwo">Computer vs. Player Two (O)</label>
+              <input type="radio" id="whoPlaysWhom" name="whoPlaysWhom" value="playerOneVPlayerTwo">
+              <label for="PlayerOneVPlayerTwo">Player One (X) vs. Player Two (O)</label>
+            </div>
+          </form>
+        </div>
+      </div>
       <button onClick="gameController.startGame();" id="new-game-button">New Game</button>
     </div>
     <div class="player-container player-container-right">
