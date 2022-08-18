@@ -176,10 +176,12 @@ const gameController = (() => {
       player1.name = gameController.getPlayerName("One");
       player2.name = "Computer";
       boardController.placePlayerOneName(player1.name);
+      boardController.placePlayerTwoName(player2.name);
     } else {
       firstPlayer = "computer";
       player1.name = "Computer";
       player2.name = gameController.getPlayerName("Two");
+      boardController.placePlayerOneName(player1.name);
       boardController.placePlayerTwoName(player2.name);
     }
   };
