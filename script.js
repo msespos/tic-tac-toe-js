@@ -48,7 +48,21 @@ const boardController = (() => {
       displayEnd(Board.gameBoard);
     }
   };
-  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, showEndOfGame };
+  const placePlayerOneName = (playerOneName) => {
+    const nameholder = document.getElementById("x-container");
+    const name = document.createTextNode("Player 1 (X): " + playerOneName);
+    nameholder.appendChild(name);
+  };
+  // player two needs to append to two different divs for mobile responsiveness
+  const placePlayerTwoName = (playerTwoName) => {
+    const nameholder = document.querySelectorAll(".o-container-1, .o-container-2");
+    nameholder.forEach((node) => {
+      const name = document.createTextNode("Player 2 (O): " + playerTwoName);
+      node.appendChild(name);
+    });
+  };
+  return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, showEndOfGame,
+           placePlayerOneName, placePlayerTwoName };
 })();
 
 // contains game logic
@@ -167,7 +181,10 @@ const gameController = (() => {
     }
     boardController.displayBoard();
   };
-  return { numPlayers, firstPlayer, startGame, gameOver, playMove };
+  const getPlayerName = (number) => {
+    return prompt("Player " + number + ", please enter your name:")
+  }
+  return { numPlayers, firstPlayer, startGame, gameOver, playMove, getPlayerName };
 })();
 
 const AI = (() => {
@@ -269,6 +286,10 @@ const Player = (name, symbol) => {
 };
 
 // initialization of players / current player / board and button
-const player1 = Player("Baby Yoda", "X");
-const player2 = Player("Luke Skywalker", "O");
+const player1 = Player("", "X");
+const player2 = Player("", "O");
+player1.name = gameController.getPlayerName("One");
+player2.name = gameController.getPlayerName("Two");
+boardController.placePlayerOneName(player1.name);
+boardController.placePlayerTwoName(player2.name);
 let currentPlayer = player1;
