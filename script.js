@@ -42,11 +42,9 @@ const boardController = (() => {
     }
   };
   const showEndOfGame = () => {
-    if (gameController.gameOver(Board.gameBoard)) {
-      disableBoard();
-      displayBoard();
-      displayEnd(Board.gameBoard);
-    }
+    disableBoard();
+    displayBoard();
+    displayEnd(Board.gameBoard);
   };
   const placePlayerOneName = (playerOneName) => {
     const nameholder = document.querySelectorAll(".x-container");
@@ -55,7 +53,7 @@ const boardController = (() => {
       div.appendChild(name);
     });
   };
-  // player two needs to append to two different divs for mobile responsiveness
+  // player two needs to be appended to two different divs for mobile responsiveness
   const placePlayerTwoName = (playerTwoName) => {
     const nameholder = document.querySelectorAll(".o-container-1, .o-container-2");
     nameholder.forEach((div) => {
@@ -130,6 +128,21 @@ const Game = (() => {
 const gameController = (() => {
   let numPlayers = "";
   let firstPlayer = "";
+  const saveSettingsButton = document.querySelector('#save-settings-button');
+  saveSettingsButton.onclick = () => {
+    player1.name = document.getElementById('playerOneName').value;
+    player2.name = document.getElementById('playerTwoName').value;
+    if (document.getElementById('playerOneVComputer').checked) {
+      numPlayers = "1";
+      firstPlayer = "human";
+    } else if (document.getElementById('computerVPlayerTwo').checked) {
+      numPlayers = "1";
+      firstPlayer = "computer";
+    } else {
+      numPlayers = "2";
+      firstPlayer = "human";
+    }
+  };
   // triggered by New Game button - sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
@@ -137,9 +150,9 @@ const gameController = (() => {
     boardController.clearBoard();
     boardController.displayBoard();
     boardController.enableBoard();
-    selectNumberOfPlayers();
+    boardController.placePlayerOneName(player1.name);
+    boardController.placePlayerTwoName(player2.name);
     if (numPlayers === "1") {
-      selectFirstPlayer();
       if (firstPlayer === "computer") {
         alert("Computer makes its move!");
         AI.computerMove(firstPlayer);
@@ -151,40 +164,6 @@ const gameController = (() => {
       boardController.displayBoard();
     } else {
       alert("Make your move, " + player1.name + "!");
-    }
-  };
-  // called by startGame
-  const selectNumberOfPlayers = () => {
-    numPlayers = prompt("One player or Two player game? Please enter 1 or 2");
-    while (numPlayers !== "1" && numPlayers !== "2") {
-      numPlayers = prompt("Please enter 1 or 2");
-    };
-    gameController.numPlayers = numPlayers;
-    if (numPlayers === "2") {
-      player1.name = gameController.getPlayerName("One");
-      player2.name = gameController.getPlayerName("Two");
-      boardController.placePlayerOneName(player1.name);
-      boardController.placePlayerTwoName(player2.name);
-    }
-  };
-  // called by startGame
-  const selectFirstPlayer = () => {
-    humanPlayer = prompt("Would you like to be the first or second player? Please enter 1 or 2")
-    while (humanPlayer !== "1" && humanPlayer !== "2") {
-      humanPlayer = prompt("Please enter 1 or 2");
-    };
-    if (humanPlayer === "1") {
-      firstPlayer = "human";
-      player1.name = gameController.getPlayerName("One");
-      player2.name = "Computer";
-      boardController.placePlayerOneName(player1.name);
-      boardController.placePlayerTwoName(player2.name);
-    } else {
-      firstPlayer = "computer";
-      player1.name = "Computer";
-      player2.name = gameController.getPlayerName("Two");
-      boardController.placePlayerOneName(player1.name);
-      boardController.placePlayerTwoName(player2.name);
     }
   };
   // check for end conditions - called by playMove
@@ -202,27 +181,30 @@ const gameController = (() => {
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
-      boardController.showEndOfGame();
+      if (gameOver(Board.gameBoard)) {
+        boardController.showEndOfGame();
+      }
       switchCurrentPlayer();
       boardController.displayBoard();
     }
-    if (gameController.numPlayers === "1" && !gameOver(Board.gameBoard)) {
+    if (numPlayers === "1" && !gameOver(Board.gameBoard)) {
       boardController.disableBoard();
       setTimeout(() => {
         AI.computerMove(firstPlayer);
-        boardController.showEndOfGame();
-        switchCurrentPlayer();
-        boardController.displayBoard();
-        boardController.enableBoard();
+        if (gameOver(Board.gameBoard)) {
+          boardController.showEndOfGame();
+        } else {
+          switchCurrentPlayer();
+          boardController.displayBoard();
+          boardController.enableBoard();
+        }
       }, 750);
     }
   };
-  const getPlayerName = (number) => {
-    return prompt("Player " + number + ", please enter your name:")
-  }
-  return { numPlayers, firstPlayer, startGame, gameOver, playMove, getPlayerName };
+  return { numPlayers, firstPlayer, startGame, gameOver, playMove };
 })();
 
+// contains methods for computer's moves
 const AI = (() => {
   // a node is an array representing the gameboard state
   // maximizingPlayer will start at false
@@ -321,27 +303,28 @@ const Player = (name, symbol) => {
   return { name, symbol };
 };
 
+// code for showing and hiding the game settings modal
+const modalController = (() => {
+  // Modal JS mostly taken from https://sabe.io/tutorials/how-to-create-modal-popup-box
+  const modal = document.querySelector(".modal");
+  const trigger = document.querySelector(".trigger");
+  const closeButton = document.querySelector(".close-button");
+  const saveSettingsButton = document.querySelector("#save-settings-button");
+  const toggleModal = () => {
+    modal.classList.toggle("show-modal");
+  }
+  const windowOnClick = (event) => {
+    if (event.target === modal) {
+      toggleModal();
+    }
+  }
+  trigger.addEventListener("click", toggleModal);
+  closeButton.addEventListener("click", toggleModal);
+  saveSettingsButton.addEventListener("click", toggleModal);
+  window.addEventListener("click", windowOnClick);
+})();
+
 // initialization of players / current player / board and button
 const player1 = Player("", "X");
 const player2 = Player("", "O");
 let currentPlayer = player1;
-
-// Modal JS taken from https://sabe.io/tutorials/how-to-create-modal-popup-box
-
-const modal = document.querySelector(".modal");
-const trigger = document.querySelector(".trigger");
-const closeButton = document.querySelector(".close-button");
-
-const toggleModal = () => {
-  modal.classList.toggle("show-modal");
-}
-
-const windowOnClick = (event) => {
-  if (event.target === modal) {
-    toggleModal();
-  }
-}
-
-trigger.addEventListener("click", toggleModal);
-closeButton.addEventListener("click", toggleModal);
-window.addEventListener("click", windowOnClick);
