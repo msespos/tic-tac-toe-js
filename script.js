@@ -160,7 +160,7 @@ const gameController = (() => {
     boardController.enableBoard();
     if (numPlayers === "1") {
       if (firstPlayer === "computer") {
-        alert("Computer makes its move!");
+        alert(player1.name + " makes its move!");
         AI.computerMove(firstPlayer);
         switchCurrentPlayer();
       } else {
