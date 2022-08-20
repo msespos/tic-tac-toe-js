@@ -49,7 +49,10 @@ const boardController = (() => {
   const placePlayerOneName = (playerOneName) => {
     const nameholder = document.querySelectorAll(".x-container");
     nameholder.forEach((div) => {
-      const name = document.createTextNode("Player 1 (X): " + playerOneName);
+      let name = document.createTextNode("Player 1 (X)");
+      if (playerOneName !== "Player 1") {
+        name = document.createTextNode("Player 1 (X): " + playerOneName);
+      }
       div.appendChild(name);
     });
   };
@@ -57,7 +60,10 @@ const boardController = (() => {
   const placePlayerTwoName = (playerTwoName) => {
     const nameholder = document.querySelectorAll(".o-container-1, .o-container-2");
     nameholder.forEach((div) => {
-      const name = document.createTextNode("Player 2 (O): " + playerTwoName);
+      let name = document.createTextNode("Player 2 (O)");
+      if (playerTwoName !== "Player 2") {
+        name = document.createTextNode("Player 2 (O): " + playerTwoName);
+      }
       div.appendChild(name);
     });
   };
@@ -142,16 +148,16 @@ const gameController = (() => {
       numPlayers = "2";
       firstPlayer = "human";
     }
+    boardController.clearNames();
+    boardController.placePlayerOneName(player1.name);
+    boardController.placePlayerTwoName(player2.name);
   };
   // triggered by New Game button - sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
-    boardController.clearNames();
     boardController.clearBoard();
     boardController.displayBoard();
     boardController.enableBoard();
-    boardController.placePlayerOneName(player1.name);
-    boardController.placePlayerTwoName(player2.name);
     if (numPlayers === "1") {
       if (firstPlayer === "computer") {
         alert("Computer makes its move!");
@@ -183,9 +189,10 @@ const gameController = (() => {
       boardController.placeSymbol(space, currentPlayer.symbol);
       if (gameOver(Board.gameBoard)) {
         boardController.showEndOfGame();
+      } else {
+        switchCurrentPlayer();
+        boardController.displayBoard();
       }
-      switchCurrentPlayer();
-      boardController.displayBoard();
     }
     if (numPlayers === "1" && !gameOver(Board.gameBoard)) {
       boardController.disableBoard();
@@ -325,6 +332,8 @@ const modalController = (() => {
 })();
 
 // initialization of players / current player / board and button
-const player1 = Player("", "X");
-const player2 = Player("", "O");
+const player1 = Player("Player 1", "X");
+const player2 = Player("Player 2", "O");
+boardController.placePlayerOneName(player1.name);
+boardController.placePlayerTwoName(player2.name);
 let currentPlayer = player1;
