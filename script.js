@@ -46,6 +46,18 @@ const boardController = (() => {
     displayBoard();
     displayEnd(Board.gameBoard);
   };
+  const showWinningMove = () => {
+    Game.winningMove.forEach((n) => {
+      const box = document.getElementById("box-" + (n + 1));
+      box.style.color = "red";
+    });
+  };
+  const resetWinningMoveDisplay = () => {
+    for (i = 0; i < 9; i++) {
+      const box = document.getElementById("box-" + (i + 1));
+      box.style.color = "purple";
+    }
+  };
   const placePlayerOneName = (playerOneName) => {
     const nameholder = document.querySelectorAll(".x-container");
     nameholder.forEach((div) => {
@@ -76,11 +88,12 @@ const boardController = (() => {
     });
   }
   return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, showEndOfGame,
-           placePlayerOneName, placePlayerTwoName, clearNames };
+           showWinningMove, resetWinningMoveDisplay, placePlayerOneName, placePlayerTwoName, clearNames };
 })();
 
 // contains game logic
 const Game = (() => {
+  let winningMove = [];
   // called by gameController.gameOver and boardController.displayEnd
   const fullBoard = (board) => {
     let fullOrNot = true;
@@ -89,6 +102,9 @@ const Game = (() => {
         fullOrNot = false;
       }
     });
+    if (fullOrNot === true) {
+      Game.winningMove = [];
+    }
     return fullOrNot;
   };
   // called by gameController.gameOver and boardController.displayEnd
@@ -103,6 +119,7 @@ const Game = (() => {
           board[i] === board[i + 1] &&
           board[i + 1] === board[i + 2]) {
         winOrNot = true;
+        Game.winningMove = [i, i + 1, i + 2];
       }
     }
     return winOrNot;
@@ -115,19 +132,24 @@ const Game = (() => {
           board[i] === board[i + 3] &&
           board[i + 3] === board[i + 6]) {
         winOrNot = true;
+        Game.winningMove = [i, i + 3, i + 6];
       }
     }
     return winOrNot;
   };
   // called by winningGame
   const winViaDiagonal = (board) => {
-    return board[4] != "" &&
-            (board[0] === board[4] &&
-             board[4] === board[8] ||
-             board[2] === board[4] &&
-             board[4] === board[6]);
+    let winOrNot = false;
+    if (board[4] != "" && (board[0] === board[4] && board[4] === board[8])) {
+      winOrNot = true;
+      Game.winningMove = [0, 4, 8];
+    } else if (board[4] != "" && board[2] === board[4] && board[4] === board[6]) {
+      winOrNot = true;
+      Game.winningMove = [2, 4, 6];
+    }
+    return winOrNot;
   };
-  return { fullBoard, winningGame };
+  return { winningMove, fullBoard, winningGame };
 })();
 
 // contains gameplay methods
@@ -155,7 +177,9 @@ const gameController = (() => {
   // triggered by New Game button - sets up and starts game, depending on user input
   const startGame = () => {
     currentPlayer = player1;
+    Game.winningMove = [];
     boardController.clearBoard();
+    boardController.resetWinningMoveDisplay();
     boardController.displayBoard();
     boardController.enableBoard();
     if (numPlayers === "1") {
@@ -188,6 +212,7 @@ const gameController = (() => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
       if (gameOver(Board.gameBoard)) {
+        boardController.showWinningMove();
         boardController.showEndOfGame();
       } else {
         switchCurrentPlayer();
@@ -199,6 +224,7 @@ const gameController = (() => {
       setTimeout(() => {
         AI.computerMove(firstPlayer);
         if (gameOver(Board.gameBoard)) {
+          boardController.showWinningMove();
           boardController.showEndOfGame();
         } else {
           switchCurrentPlayer();
