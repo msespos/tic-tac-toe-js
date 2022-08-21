@@ -129,6 +129,12 @@ a, h6 {
   border-radius: 20px;
 }
 
+@media (max-width: 768px) {
+  .form-text {
+    font-size: small;
+  }
+}
+
 .show-modal {
   opacity: 1;
   visibility: visible;
