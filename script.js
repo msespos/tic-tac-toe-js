@@ -11,7 +11,7 @@ const boardController = (() => {
     Board.gameBoard[space] = symbol;
   };
   // called by gameController.playMove
-  const displayEnd = (board) => {
+  const endAlert = (board) => {
     if (Game.winningGame(board)) {
       alert("Game Over - " + currentPlayer.name + " wins!");
     } else if (Game.fullBoard(board)) {
@@ -44,7 +44,7 @@ const boardController = (() => {
   const showEndOfGame = () => {
     disableBoard();
     displayBoard();
-    displayEnd(Board.gameBoard);
+    endAlert(Board.gameBoard);
   };
   const showWinningMove = () => {
     Game.winningMove.forEach((n) => {
@@ -86,7 +86,7 @@ const boardController = (() => {
         div.removeChild(div.firstChild);
       }
     });
-  }
+  };
   return { placeSymbol, disableBoard, enableBoard, clearBoard, displayBoard, showEndOfGame,
            showWinningMove, resetWinningMoveDisplay, placePlayerOneName, placePlayerTwoName, clearNames };
 })();
@@ -94,7 +94,8 @@ const boardController = (() => {
 // contains game logic
 const Game = (() => {
   let winningMove = [];
-  // called by gameController.gameOver and boardController.displayEnd
+  // called by gameController.gameOver and boardController.endAlert
+  // sets winningMove as well as returning a boolean
   const fullBoard = (board) => {
     let fullOrNot = true;
     board.forEach((space) => {
@@ -107,11 +108,11 @@ const Game = (() => {
     }
     return fullOrNot;
   };
-  // called by gameController.gameOver and boardController.displayEnd
+  // called by gameController.gameOver and boardController.endAlert
   const winningGame = (board) => {
     return winViaRow(board) || winViaColumn(board) || winViaDiagonal(board);
   };
-  // called by winningGame
+  // called by winningGame - sets winningMove as well as returning a boolean
   const winViaRow = (board) => {
     let winOrNot = false;
     for (let i = 0; i < 9; i += 3) {
@@ -124,7 +125,7 @@ const Game = (() => {
     }
     return winOrNot;
   };
-  // called by winningGame
+  // called by winningGame - sets winningMove as well as returning a boolean
   const winViaColumn = (board) => {
     let winOrNot = false;
     for (let i = 0; i < 3; i += 1) {
@@ -137,7 +138,7 @@ const Game = (() => {
     }
     return winOrNot;
   };
-  // called by winningGame
+  // called by winningGame - sets winningMove as well as returning a boolean
   const winViaDiagonal = (board) => {
     let winOrNot = false;
     if (board[4] != "" && (board[0] === board[4] && board[4] === board[8])) {
@@ -156,6 +157,7 @@ const Game = (() => {
 const gameController = (() => {
   let numPlayers = "";
   let firstPlayer = "";
+  // triggered by Save Game Settings button in modal - saves data from settings form
   const saveSettingsButton = document.querySelector('#save-settings-button');
   saveSettingsButton.onclick = () => {
     player1.name = document.getElementById('playerOneName').value;
@@ -174,7 +176,7 @@ const gameController = (() => {
     boardController.placePlayerOneName(player1.name);
     boardController.placePlayerTwoName(player2.name);
   };
-  // triggered by New Game button - sets up and starts game, depending on user input
+  // triggered by New Game button - sets up and starts game, using current settings
   const startGame = () => {
     currentPlayer = player1;
     Game.winningMove = [];
@@ -207,7 +209,8 @@ const gameController = (() => {
       currentPlayer = player1;
     }
   };
-  // play a move - triggered by an onClick in index.html
+  // play a move - triggered by clicking on a board space (onClick in index.html)
+  // plays human move; if in 1-player mode, plays computer move as well
   const playMove = (space) => {
     if (Board.gameBoard[space] === "") {
       boardController.placeSymbol(space, currentPlayer.symbol);
@@ -239,9 +242,7 @@ const gameController = (() => {
 
 // contains methods for computer's moves
 const AI = (() => {
-  // a node is an array representing the gameboard state
-  // maximizingPlayer will start at false
-  // called by gameController.computerMove
+  // makes the computer's move using the minimax method
   const computerMove = (firstPlayer) => {
     let availableMoves = [];
     Board.gameBoard.forEach((space, index) => {
@@ -255,6 +256,9 @@ const AI = (() => {
     let move = availableMoves[minimaxesOfChildren.indexOf(max)];
     boardController.placeSymbol(move, currentPlayer.symbol);
   };
+  // a node is an array representing the gameboard state
+  // maximizingPlayer will start at false
+  // called by gameController.computerMove
   const minimax = (node, depth, maximizingPlayer, firstPlayer) => {
     if (depth === 0 || isTerminal(node)) {
       return heuristicValue(node, firstPlayer);
