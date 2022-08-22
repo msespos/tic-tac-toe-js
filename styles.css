@@ -12,7 +12,7 @@ h1 {
   font-size: xxx-large;
   display: flex;
   justify-content: center;
-  margin: 15px 0px;
+  margin: 40px 0px 15px;
 }
 
 a, h6 {
@@ -59,15 +59,22 @@ a, h6 {
 .x-container, .o-container-1, .o-container-2 {
   display: flex;
   justify-content: center;
+  margin-bottom: 10px;
 }
 
 @media (min-width: 1366px) {
-  .o-container-1, o-container-2 {
+  .o-container-1 {
     display: none;
   }
 }
 
 @media (max-width: 1366px) {
+  .o-container-2 {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
   .x-container, .o-container-1, .o-container-2 {
     font-size: medium;
   }
@@ -102,8 +109,12 @@ a, h6 {
   }
 }
 
+.trigger {
+  margin-top: 40px;
+}
+
 #new-game-button {
-  margin-top: 42px;
+  margin-top: 20px;
 }
 
 /* Modal CSS taken from https://sabe.io/tutorials/how-to-create-modal-popup-box */
